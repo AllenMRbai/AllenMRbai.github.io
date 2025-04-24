@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.0">
+
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.0">
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在 generator 函数内部，通过yield*语句，可以将yield委托给其他任何实现iterable的对象。 委托给 generator 函数生成的iterable对象调用 generator 函数会返回一个实现iterable的对象(该对象同时也是一个iterator)。 通过yield* otherGenerator()可以将 generator 内的yield委托给其他 generat">
+<meta name="keywords" content="javascript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="yield-delegation">
+<meta property="og:url" content="https://allenmrbai.github.io/2019/02/28/yield-delegation/index.html">
+<meta property="og:site_name" content="Allen&#39;s Notes">
+<meta property="og:description" content="在 generator 函数内部，通过yield*语句，可以将yield委托给其他任何实现iterable的对象。 委托给 generator 函数生成的iterable对象调用 generator 函数会返回一个实现iterable的对象(该对象同时也是一个iterator)。 通过yield* otherGenerator()可以将 generator 内的yield委托给其他 generat">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2025-04-24T09:20:11.083Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="yield-delegation">
+<meta name="twitter:description" content="在 generator 函数内部，通过yield*语句，可以将yield委托给其他任何实现iterable的对象。 委托给 generator 函数生成的iterable对象调用 generator 函数会返回一个实现iterable的对象(该对象同时也是一个iterator)。 通过yield* otherGenerator()可以将 generator 内的yield委托给其他 generat">
+
+
+
+
+
+
+  <link rel="canonical" href="https://allenmrbai.github.io/2019/02/28/yield-delegation/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>yield-delegation | Allen's Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Allen's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Quik notes</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://allenmrbai.github.io/2019/02/28/yield-delegation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="博主">
+      <meta itemprop="description" content="记录学习的过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Allen's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">yield-delegation
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建于：2019-02-28 15:47:39" itemprop="dateCreated datePublished" datetime="2019-02-28T15:47:39+08:00">2019-02-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="更新于：2025-04-24 17:20:11" itemprop="dateModified" datetime="2025-04-24T17:20:11+08:00">2025-04-24</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在 generator 函数内部，通过<code>yield*</code>语句，可以将<code>yield</code>委托给其他任何实现<code>iterable</code>的对象。</p>
+<h3 id="委托给-generator-函数生成的iterable对象"><a href="#委托给-generator-函数生成的iterable对象" class="headerlink" title="委托给 generator 函数生成的iterable对象"></a>委托给 generator 函数生成的<code>iterable</code>对象</h3><p>调用 generator 函数会返回一个实现<code>iterable</code>的对象(该对象同时也是一个<code>iterator</code>)。</p>
+<p>通过<code>yield* otherGenerator()</code>可以将 generator 内的<code>yield</code>委托给其他 generator 生成的<code>iterable</code>对象。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"*foo() starting"</span>);</span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"foo 1"</span>;</span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"foo 2"</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"*foo() finished"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">bar</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"bar 1"</span>;</span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"bar 2"</span>;</span><br><span class="line">  <span class="keyword">yield</span>* foo(); <span class="comment">// `yield`-delegation!</span></span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"bar 3"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it = bar();</span><br><span class="line"></span><br><span class="line">it.next().value;</span><br><span class="line"><span class="comment">// "bar 1"</span></span><br><span class="line">it.next().value;</span><br><span class="line"><span class="comment">// "bar 2"</span></span><br><span class="line">it.next().value;</span><br><span class="line"><span class="comment">// *foo() starting</span></span><br><span class="line"><span class="comment">// "foo 1"</span></span><br><span class="line">it.next().value;</span><br><span class="line"><span class="comment">// "foo 2"</span></span><br><span class="line">it.next().value;</span><br><span class="line"><span class="comment">// *foo() finished</span></span><br><span class="line"><span class="comment">// "bar 3"</span></span><br></pre></td></tr></table></figure>
+<p>可以看到上面的代码中，在调用第 3 个<code>next</code>方法时返回的是<code>foo</code>里面<code>yield</code>的<code>&quot;foo 1&quot;</code>；在调用第 5 个<code>next</code>时，并没有返回<code>foo</code> generator 隐式<code>return</code>的<code>undefined</code>,而是返回了<code>&quot;bar 3&quot;</code>。</p>
+<p>如果<code>foo</code>内有显式的<code>return</code>语句，那么在进行 yield-delegation 时是否会返回<code>foo</code> <code>return</code>的值吗？</p>
+<p>下面的代码在<code>foo</code>中添加了一个<code>return</code>语句。在<code>bar</code>内将<code>yield* foo()</code>表达式的值赋值给<code>tmp</code>变量并打印。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"*foo() starting"</span>);</span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"foo 1"</span>;</span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"foo 2"</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"*foo() finished"</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="string">"foo 3"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">bar</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"bar 1"</span>;</span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"bar 2"</span>;</span><br><span class="line">  <span class="keyword">var</span> tmp = <span class="keyword">yield</span>* foo(); <span class="comment">// `yield`-delegation!</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"在bar内打印"</span>, tmp);</span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"bar 3"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it = bar();</span><br><span class="line"></span><br><span class="line">it.next().value;</span><br><span class="line"><span class="comment">// "bar 1"</span></span><br><span class="line">it.next().value;</span><br><span class="line"><span class="comment">// "bar 2"</span></span><br><span class="line">it.next().value;</span><br><span class="line"><span class="comment">// *foo() starting</span></span><br><span class="line"><span class="comment">// "foo 1"</span></span><br><span class="line">it.next().value;</span><br><span class="line"><span class="comment">// "foo 2"</span></span><br><span class="line">it.next().value;</span><br><span class="line"><span class="comment">// *foo() finished</span></span><br><span class="line"><span class="comment">// 在bar内打印 foo 3</span></span><br><span class="line"><span class="comment">// "bar 3"</span></span><br></pre></td></tr></table></figure>
+<p>在第 5 次调用<code>next</code>方法时，可以发现<code>foo</code> <code>return</code>的<code>&quot;foo 3&quot;</code>变成了<code>yield* foo()</code>表达式的值，并被打印为<code>&quot;在bar内打印 foo 3&quot;</code>;<code>&quot;bar 3&quot;</code>成为<code>next</code>方法的返回值。</p>
+<h3 id="委托给其他任何实现iterable的对象"><a href="#委托给其他任何实现iterable的对象" class="headerlink" title="委托给其他任何实现iterable的对象"></a>委托给其他任何实现<code>iterable</code>的对象</h3><p>generator 内部的<code>yield*</code>语句也能将<code>yield</code>委托给其他非 generator 生成的<code>iterable</code>对象。例如 数组就是一个实现了<code>iterable</code>的对象。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">bar</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"inside `*bar()`:"</span>, <span class="keyword">yield</span> <span class="string">"A"</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// `yield`-delegation to a non-generator!</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"inside `*bar()`:"</span>, <span class="keyword">yield</span>* [<span class="string">"B"</span>, <span class="string">"C"</span>, <span class="string">"D"</span>]);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"inside `*bar()`:"</span>, <span class="keyword">yield</span> <span class="string">"E"</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="string">"F"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it = bar();</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next().value);</span><br><span class="line"><span class="comment">// outside: A</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">1</span>).value);</span><br><span class="line"><span class="comment">// inside `*bar()`: 1</span></span><br><span class="line"><span class="comment">// outside: B</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">2</span>).value);</span><br><span class="line"><span class="comment">// outside: C</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">3</span>).value);</span><br><span class="line"><span class="comment">// outside: D</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">4</span>).value);</span><br><span class="line"><span class="comment">// inside `*bar()`: undefined</span></span><br><span class="line"><span class="comment">// outside: E</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">5</span>).value);</span><br><span class="line"><span class="comment">// inside `*bar()`: 5</span></span><br><span class="line"><span class="comment">// outside: F</span></span><br></pre></td></tr></table></figure>
+<p>也可以委托给自己手写的<code>iterable</code>对象。由于 javascript 不是强类型语言，如果对象上含有<code>Symbol.iterator</code>方法，那么就可以将该对象当做一个<code>iterable</code>对象；如果对象上含有<code>next</code>方法，那就可以将该对象当做一个<code>iterator</code>对象。下面的<code>myIterable</code>对象即实现了<code>Symbol.iterator</code>方法也实现了<code>next</code>方法，所以它即是一个<code>iterable</code>又是一个<code>iterator</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myIterable = &#123;</span><br><span class="line">  [<span class="built_in">Symbol</span>.iterator]: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">  num: <span class="number">98</span>,</span><br><span class="line">  next: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> self = <span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">if</span> (self.num &lt; <span class="number">101</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123; <span class="attr">value</span>: <span class="built_in">String</span>.fromCharCode(self.num++), <span class="attr">done</span>: <span class="literal">false</span> &#125;;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123; <span class="attr">value</span>: <span class="built_in">String</span>.fromCharCode(<span class="number">101</span>), <span class="attr">done</span>: <span class="literal">true</span> &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">bar</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"inside `*bar()`:"</span>, <span class="keyword">yield</span> <span class="string">"A"</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// `yield`-delegation to a non-generator!</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"inside `*bar()`:"</span>, <span class="keyword">yield</span>* myIterable);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"inside `*bar()`:"</span>, <span class="keyword">yield</span> <span class="string">"E"</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="string">"F"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it = bar();</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next().value);</span><br><span class="line"><span class="comment">// outside: A</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">1</span>).value);</span><br><span class="line"><span class="comment">// inside `*bar()`: 1</span></span><br><span class="line"><span class="comment">// outside: b</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">2</span>).value);</span><br><span class="line"><span class="comment">// outside: c</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">3</span>).value);</span><br><span class="line"><span class="comment">// outside: d</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">4</span>).value);</span><br><span class="line"><span class="comment">// inside `*bar()`: e</span></span><br><span class="line"><span class="comment">// outside: E</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">5</span>).value);</span><br><span class="line"><span class="comment">// inside `*bar()`: 5</span></span><br><span class="line"><span class="comment">// outside: F</span></span><br></pre></td></tr></table></figure>
+<h3 id="异常委托"><a href="#异常委托" class="headerlink" title="异常委托"></a>异常委托</h3><p>被委托的<code>iterator</code>内部执行过程发生异常，如果异常被捕获，那么捕获处理完异常后还按原来的逻辑运行；如果异常未被捕获，那么异常会被抛出，异常会被抛到<code>yield*</code>语句那。下面是《YOU DON’T KNOW JS》内的例子。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">yield</span> <span class="string">"B"</span>;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"error caught inside `*foo()`:"</span>, err);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"C"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">throw</span> <span class="string">"D"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">bar</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"A"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">yield</span>* foo();</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"error caught inside `*bar()`:"</span>, err);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"E"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">yield</span>* baz();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// note: can't get here!</span></span><br><span class="line">  <span class="keyword">yield</span> <span class="string">"G"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">baz</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">throw</span> <span class="string">"F"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it = bar();</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next().value);</span><br><span class="line"><span class="comment">// outside: A</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">1</span>).value);</span><br><span class="line"><span class="comment">// outside: B</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.throw(<span class="number">2</span>).value);</span><br><span class="line"><span class="comment">// error caught inside `*foo()`: 2</span></span><br><span class="line"><span class="comment">// outside: C</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">3</span>).value);</span><br><span class="line"><span class="comment">// error caught inside `*bar()`: D</span></span><br><span class="line"><span class="comment">// outside: E</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"outside:"</span>, it.next(<span class="number">4</span>).value);</span><br><span class="line">&#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">"error caught outside:"</span>, err);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// error caught outside: F</span></span><br></pre></td></tr></table></figure>
+<h3 id="递归委托"><a href="#递归委托" class="headerlink" title="递归委托"></a>递归委托</h3><p>下面是《YOU DON’T KNOW JS》里的例子。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">foo</span>(<span class="params">val</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (val &gt; <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="comment">// generator recursion</span></span><br><span class="line">    val = <span class="keyword">yield</span>* foo(val - <span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">yield</span> request(<span class="string">"http://some.url/?v="</span> + val);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">bar</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> r1 = <span class="keyword">yield</span>* foo(<span class="number">3</span>);</span><br><span class="line">  <span class="built_in">console</span>.log(r1);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">run(bar);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/javascript/" rel="tag"># javascript</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/28/实现一个async函数/" rel="next" title="实现一个async函数">
+                <i class="fa fa-chevron-left"></i> 实现一个async函数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/28/defineProperty/" rel="prev" title="Object.defineProperty">
+                Object.defineProperty <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="博主">
+            
+              <p class="site-author-name" itemprop="name">博主</p>
+              <p class="site-description motion-element" itemprop="description">记录学习的过程</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#委托给-generator-函数生成的iterable对象"><span class="nav-number">1.</span> <span class="nav-text">委托给 generator 函数生成的iterable对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#委托给其他任何实现iterable的对象"><span class="nav-number">2.</span> <span class="nav-text">委托给其他任何实现iterable的对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异常委托"><span class="nav-number">3.</span> <span class="nav-text">异常委托</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#递归委托"><span class="nav-number">4.</span> <span class="nav-text">递归委托</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Allen Bai</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.0.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.0"></script>
+
+  <script src="/js/src/motion.js?v=7.0.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.0"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.0"></script>
+<script src="/js/src/post-details.js?v=7.0.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=7.0.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

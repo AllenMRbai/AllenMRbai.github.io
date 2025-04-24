@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.0">
+
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.0">
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="以下内容是读《YOU DON’T KNOW JS》系列的《types &amp;amp; grammar》第 4 章节的笔记。 抽象值运算（Abstract Value Operations）“abstract operations” 通俗的理解就是“仅内部使用的操作”。在 ES5 specification 内定义了 9 个 abstract value operations ,其中作者重点介绍了 To">
+<meta name="keywords" content="javascript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="javascript类型转换">
+<meta property="og:url" content="https://allenmrbai.github.io/2019/02/28/javascript类型转换/index.html">
+<meta property="og:site_name" content="Allen&#39;s Notes">
+<meta property="og:description" content="以下内容是读《YOU DON’T KNOW JS》系列的《types &amp;amp; grammar》第 4 章节的笔记。 抽象值运算（Abstract Value Operations）“abstract operations” 通俗的理解就是“仅内部使用的操作”。在 ES5 specification 内定义了 9 个 abstract value operations ,其中作者重点介绍了 To">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2025-04-24T09:20:11.082Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="javascript类型转换">
+<meta name="twitter:description" content="以下内容是读《YOU DON’T KNOW JS》系列的《types &amp;amp; grammar》第 4 章节的笔记。 抽象值运算（Abstract Value Operations）“abstract operations” 通俗的理解就是“仅内部使用的操作”。在 ES5 specification 内定义了 9 个 abstract value operations ,其中作者重点介绍了 To">
+
+
+
+
+
+
+  <link rel="canonical" href="https://allenmrbai.github.io/2019/02/28/javascript类型转换/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>javascript类型转换 | Allen's Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Allen's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Quik notes</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://allenmrbai.github.io/2019/02/28/javascript类型转换/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="博主">
+      <meta itemprop="description" content="记录学习的过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Allen's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">javascript类型转换
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建于：2019-02-28 15:36:15" itemprop="dateCreated datePublished" datetime="2019-02-28T15:36:15+08:00">2019-02-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="更新于：2025-04-24 17:20:11" itemprop="dateModified" datetime="2025-04-24T17:20:11+08:00">2025-04-24</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>以下内容是读《YOU DON’T KNOW JS》系列的《types &amp; grammar》第 4 章节的笔记。</p>
+<h2 id="抽象值运算（Abstract-Value-Operations）"><a href="#抽象值运算（Abstract-Value-Operations）" class="headerlink" title="抽象值运算（Abstract Value Operations）"></a>抽象值运算（Abstract Value Operations）</h2><p>“abstract operations” 通俗的理解就是“仅内部使用的操作”。在 ES5 specification 内定义了 9 个 abstract value operations ,其中作者重点介绍了 <code>ToString</code> <code>ToNumber</code> 和 <code>ToBoolean</code>。</p>
+<h3 id="ToString"><a href="#ToString" class="headerlink" title="ToString"></a>ToString</h3><p>任何非字符串类型的值被转为 string 时，都会经过 <code>ToString</code> 的处理。</p>
+<h4 id="基本类型-ToString"><a href="#基本类型-ToString" class="headerlink" title="基本类型 ToString"></a>基本类型 <code>ToString</code></h4><p>基本类型<code>ToString</code>运算的规则很简单，基本上原来什么样，转换后就是什么样的。但是需要注意特大或特小的数字转成字符串时会变成指数的形式。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">String</span>(<span class="literal">false</span>); <span class="comment">// "false"</span></span><br><span class="line"><span class="built_in">String</span>(<span class="literal">undefined</span>); <span class="comment">// "undefined"</span></span><br><span class="line"><span class="built_in">String</span>(<span class="literal">null</span>); <span class="comment">// "null"</span></span><br><span class="line"><span class="built_in">String</span>(<span class="number">10</span>); <span class="comment">// "10"</span></span><br><span class="line"><span class="built_in">String</span>(<span class="built_in">Symbol</span>(<span class="string">"hello"</span>)); <span class="comment">// "Symbol(hello)"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="number">1.07</span> * <span class="number">1000</span> * <span class="number">1000</span> * <span class="number">1000</span> * <span class="number">1000</span> * <span class="number">1000</span> * <span class="number">1000</span> * <span class="number">1000</span>;</span><br><span class="line"><span class="built_in">String</span>(a); <span class="comment">// "1.07e21"</span></span><br></pre></td></tr></table></figure>
+<h4 id="对象-ToString"><a href="#对象-ToString" class="headerlink" title="对象 ToString"></a>对象 <code>ToString</code></h4><p>一般对象的<code>ToString</code>运算会调用默认的<code>toString</code>方法（因为大部分对象原型链顶部是<code>Object.prototype</code>，它内部有<code>toString</code>方法;它会返回内部的<code>[[Class]]</code>,例如 <code>&quot;[object Object]&quot;</code>）。</p>
+<p>如果重写了对象的<code>toString</code>方法，那么就调用重写后的<code>toString</code>。注意重写的<code>toString</code>方法只能返回基本数据类型，返回对象会抛出异常。</p>
+<p>还有一种特殊情况就是用<code>Object.create(null)</code>创建以<code>null</code>为原型的对象。它的原型链上没有<code>toString</code>,执行<code>ToString</code>运算时会抛出异常。</p>
+<h3 id="ToNumber"><a href="#ToNumber" class="headerlink" title="ToNumber"></a>ToNumber</h3><p>任何非 number 类型的值被转为 number 时，都会经过 <code>ToNumber</code> 的处理。</p>
+<h4 id="基本类型-ToNumber"><a href="#基本类型-ToNumber" class="headerlink" title="基本类型 ToNumber"></a>基本类型 <code>ToNumber</code></h4><p>基本数据类型转 number 的规则如下。注意<code>null</code> 转成数字后是 0 而不<code>NaN</code>，空字符串转成数字后是 0，<code>symbol</code> 不能转数字，否则报错。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+<span class="literal">null</span>; <span class="comment">// 0</span></span><br><span class="line">+<span class="literal">undefined</span>; <span class="comment">// NaN</span></span><br><span class="line">+<span class="literal">true</span>; <span class="comment">// 1</span></span><br><span class="line">+<span class="literal">false</span>; <span class="comment">// 0</span></span><br><span class="line">+<span class="string">"5"</span>; <span class="comment">// 5</span></span><br><span class="line">+<span class="string">"5allen"</span>; <span class="comment">// NaN</span></span><br><span class="line">+<span class="string">""</span>; <span class="comment">// 0</span></span><br><span class="line">+<span class="built_in">Symbol</span>(<span class="number">10</span>); <span class="comment">// 抛出异常</span></span><br></pre></td></tr></table></figure>
+<h4 id="对象-ToNumber"><a href="#对象-ToNumber" class="headerlink" title="对象 ToNumber"></a>对象 <code>ToNumber</code></h4><p>对象转 number 时，会先执行一个<code>ToPrimitive</code>的抽象值运算。执行<code>ToPrimitive</code>后返回的基本数据类型再按前面提到的基本数据类型转 number 的规则转换。</p>
+<p><code>ToPrimitive</code>运算会先尝试调用<code>valueOf</code>方法，如果返回的结果是基本数据类型就返回运算结果；如果对象上没有<code>valueOf</code>方法或<code>valueOf</code>返回的结果不是基本数据类型就尝试调用<code>toString</code>方法；如果<code>toString</code>方法不存在或<code>toString</code>方法返回对象，会抛出异常。</p>
+<p><code>ToPrimitive</code>抽象值运算的流程图如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    A(start) --&gt;B&#123;valueOf存在吗&#125;</span><br><span class="line">    B --&gt;|存在| C[执行valueOf]</span><br><span class="line">    B --&gt;|不存在| F[执行valueOf]</span><br><span class="line">    C --&gt;D&#123;返回结果是基本类型吗&#125;</span><br><span class="line">    D --&gt;|是| E(返回运算结果)</span><br><span class="line">    D --&gt;|否| F&#123;toString存在吗&#125;</span><br><span class="line">    F --&gt;|存在| H[执行toString]</span><br><span class="line">    F --&gt;|不存在| G(抛出异常)</span><br><span class="line">    H --&gt;I&#123;返回结果是基本类型吗&#125;</span><br><span class="line">    I --&gt;|是| J(返回运算结果)</span><br><span class="line">    I --&gt;|否| K(抛出异常)</span><br></pre></td></tr></table></figure>
+<h2 id="ToBoolean"><a href="#ToBoolean" class="headerlink" title="ToBoolean"></a>ToBoolean</h2><p>强转为<code>boolean</code>后的结果为<code>false</code>的值，称为<code>falsy value</code>。以下是所有的<code>falsy value</code>。</p>
+<ul>
+<li><code>undefined</code></li>
+<li><code>null</code></li>
+<li><code>false</code></li>
+<li><code>+0</code> <code>-0</code> <code>NaN</code></li>
+<li><code>&quot;&quot;</code></li>
+</ul>
+<p>不在以上列表中的所以其他值都是<code>truthy value</code>，也就是说其他值在强转为<code>boolean</code>后的结果都是<code>true</code>。</p>
+<h2 id="显式转换（Explicit-Coercion）"><a href="#显式转换（Explicit-Coercion）" class="headerlink" title="显式转换（Explicit Coercion）"></a>显式转换（Explicit Coercion）</h2><p>我们知道很多操作会在内部对值进行转换，但是为了让自己和他人更直观地阅读代码，我们最好用显式的方式来对值进行转换。</p>
+<h3 id="显式：Strings-Numbers"><a href="#显式：Strings-Numbers" class="headerlink" title="显式：Strings  Numbers"></a>显式：Strings <--> Numbers</--></h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">42</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="built_in">String</span>(a);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> c = <span class="string">"3.14"</span>;</span><br><span class="line"><span class="keyword">var</span> d = <span class="built_in">Number</span>(c);</span><br><span class="line"></span><br><span class="line">b; <span class="comment">// "42"</span></span><br><span class="line">d; <span class="comment">// 3.14</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">42</span>;</span><br><span class="line"><span class="keyword">var</span> b = a.toString();</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> c = <span class="string">"3.14"</span>;</span><br><span class="line"><span class="keyword">var</span> d = +c;</span><br><span class="line"></span><br><span class="line">b; <span class="comment">// "42"</span></span><br><span class="line">d; <span class="comment">// 3.14</span></span><br></pre></td></tr></table></figure>
+<p>string 和 number 间的转换，作者认为<code>String(..)</code> <code>Number(..)</code> <code>toString()</code>这几个方法是显式的转换。<code>+ &quot;3.14&quot;</code>这种形式的转换在 js 社区内普遍也被认为是一种显式的转换，但是该方法在某些场合会让代码变得比较难以理解，例子如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> c = <span class="string">"3.14"</span>;</span><br><span class="line"><span class="keyword">var</span> d = <span class="number">5</span> + +c;</span><br><span class="line"></span><br><span class="line">d; <span class="comment">// 8.14</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> + -+(+(+-+<span class="number">1</span>)); <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+<p>总结：作者推荐使用<code>Sting(..)</code> <code>Number(..)</code> <code>toString()</code>和一元操作符<code>+</code>来显示地将其他值转为 number 和 string。避免在某些会引起误解的地方使用一元操作符<code>+</code>。</p>
+<h3 id="显式：Parsing-Numeric-Strings"><a href="#显式：Parsing-Numeric-Strings" class="headerlink" title="显式：Parsing Numeric Strings"></a>显式：Parsing Numeric Strings</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">"42"</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="string">"42px"</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">Number</span>(a); <span class="comment">// 42</span></span><br><span class="line"><span class="built_in">parseInt</span>(a); <span class="comment">// 42</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">Number</span>(b); <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">parseInt</span>(b); <span class="comment">// 42</span></span><br></pre></td></tr></table></figure>
+<p>除了用<code>Number(..)</code>方法进行转换，我们还可以用<code>parseInt(..)</code>(还有它的双胞胎<code>parseFloat(..)</code>)来将其他值解析为 number。<code>parseInt(..)</code>会从左到又解析，直到碰到非数字字符;而<code>Number(..)</code>方法（或其他转换方法）转换的字符串中含非数字字符就会返回<code>NaN</code>。</p>
+<p>在使用<code>parseInt(..)</code>时，作者推荐大家仅对 string 进行解析。不然<code>parseInt(..)</code>会将值先进行<code>ToString</code>操作（前面介绍过的抽象值操作），然后再进行解析；如果这样，这里面就带有隐式的转换，可能会带来意想不到的结果，例子如下。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">parseInt</span>(<span class="number">0.000008</span>); <span class="comment">// 0   ("0" from "0.000008")</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="number">0.0000008</span>); <span class="comment">// 8   ("8" from "8e-7")</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="literal">false</span>, <span class="number">16</span>); <span class="comment">// 250 ("fa" from "false")</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="built_in">parseInt</span>, <span class="number">16</span>); <span class="comment">// 15  ("f" from "function..")</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="string">"0x10"</span>); <span class="comment">// 16</span></span><br><span class="line"><span class="built_in">parseInt</span>(<span class="string">"103"</span>, <span class="number">2</span>); <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+<p>同时作者还提示大家，当需要解析的字符串中以<code>0x</code>开头，那么<code>parseInt(..)</code>会以十六进制的方式来解析（<code>0o</code> <code>0b</code>同理）。如果明确要以 10 进制来解析，推荐大家在<code>parseInt(..)</code>的第二个参数内传入<code>10</code>，来明确告知以 10 进制的方式解析。</p>
+<p>总结：作者推荐大家仅对 string 使用<code>parseInt(..)</code>,在必要的情况下可以在第二个参数传<code>10</code>，来确保它以十进制的方式解析。</p>
+<h3 id="显式：-–-gt-Boolean"><a href="#显式：-–-gt-Boolean" class="headerlink" title="显式：* –&gt; Boolean"></a>显式：* –&gt; Boolean</h3><p>和<code>String(..)</code> <code>Number(..)</code> 一样，<code>Boolean(..)</code>是一个显式的转换方式。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">"0"</span>;</span><br><span class="line"><span class="keyword">var</span> b = [];</span><br><span class="line"><span class="keyword">var</span> c = &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> d = <span class="string">""</span>;</span><br><span class="line"><span class="keyword">var</span> e = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">var</span> f = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">var</span> g = <span class="literal">undefined</span>;</span><br><span class="line"><span class="keyword">var</span> h = <span class="literal">NaN</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">Boolean</span>(a); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">Boolean</span>(b); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">Boolean</span>(c); <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">Boolean</span>(d); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">Boolean</span>(e); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">Boolean</span>(f); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">Boolean</span>(g); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">Boolean</span>(h); <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<p>虽然<code>Boolean(..)</code>是显式的方式，但在平时的开发中并不常用。就像前面提到的用一元操作符<code>+</code>将值转为 number，我们会用<code>!</code>来将值转为 boolean。<code>!</code>会将值转为 boolean，同时也反转了 boolean 的值，所以更通用的方式是<code>!!</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">"0"</span>;</span><br><span class="line"><span class="keyword">var</span> b = [];</span><br><span class="line"><span class="keyword">var</span> c = &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> d = <span class="string">""</span>;</span><br><span class="line"><span class="keyword">var</span> e = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">var</span> f = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">var</span> g = <span class="literal">undefined</span>;</span><br><span class="line"><span class="keyword">var</span> h = <span class="literal">NaN</span>;</span><br><span class="line"></span><br><span class="line">!!a; <span class="comment">// true</span></span><br><span class="line">!!b; <span class="comment">// true</span></span><br><span class="line">!!c; <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line">!!d; <span class="comment">// false</span></span><br><span class="line">!!e; <span class="comment">// false</span></span><br><span class="line">!!f; <span class="comment">// false</span></span><br><span class="line">!!g; <span class="comment">// false</span></span><br><span class="line">!!h; <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<p>总结：作者推荐使用<code>Boolean(..)</code> <code>!!</code>来显示转化为 boolean。<code>!!</code>会在开发中比较常用。</p>
+<h2 id="隐式转换（Implicit-Coercion）"><a href="#隐式转换（Implicit-Coercion）" class="headerlink" title="隐式转换（Implicit Coercion）"></a>隐式转换（Implicit Coercion）</h2><p>所有对 JavaScript 类型转换的抱怨主要来自它的隐式转换。</p>
+<p>《JavaScript 语言精粹》的作者，Douglas Crockford 在很多会议和文字上表示应该避免使用 JavaScript 类型转换。但本书的作者认为 Douglas Crockford 想表达的确切意思应该是避免使用 JavaScript 的隐式转换。</p>
+<p>然后作者提出以下几个问题：</p>
+<blockquote>
+<p>So, is implicit coercion evil? Is it dangerous? Is it a flaw in JavaScript’s design? Should we avoid it at all costs?</p>
+</blockquote>
+<p>大意如下：</p>
+<blockquote>
+<p>所以，隐式转换是魔鬼吗？它很危险吗？它是不是 JavaScript 设计上的瑕疵？我们是否要不惜一切代价避免使用它呢？</p>
+</blockquote>
+<p>大多数的读者会一边倒地回答”Yes!”。</p>
+<p>作者认为我们需要从不同的角度去看隐式转换，否则就太狭隘了，这样会失去很多重要的细节。</p>
+<p>他明确了使用隐式转换的目的是为了减少冗余的、模板化的代码，避免不必要的实现细节。</p>
+<p>可以肯定的是，隐式转换内含有很多潜在的危险，我们需要学会避开那些会危害代码健壮的坑，而不是全盘抛弃隐式转换。</p>
+<p>以下是隐式转换中比较好的实践。</p>
+<h3 id="隐式：Strings-Numbers"><a href="#隐式：Strings-Numbers" class="headerlink" title="隐式：Strings  Numbers"></a>隐式：Strings <--> Numbers</--></h3><p><code>+</code> 操作符即可作为算数运算中的加号，也可以作为字符串的拼接符号。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">"42"</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="string">"0"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> c = <span class="number">42</span>;</span><br><span class="line"><span class="keyword">var</span> d = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">a + b; <span class="comment">// "420"</span></span><br><span class="line">c + d; <span class="comment">// 42</span></span><br></pre></td></tr></table></figure>
+<p>基本类型中做<code>+</code>操作：<code>+</code>两边其中一方是 string,那么执行的是字符串拼接，否则都是做算法运算。</p>
+<p>含对象的<code>+</code>操作：对象都会先经过<code>ToPrimitive</code>抽象值运算得到基本类型，然后再按基本类型的规则做<code>+</code>运算。</p>
+<p><code>a + &quot;&quot;</code>是我们常用的转 string 方法，但值得注意的是它和我们前面提到的显式转 string 的方法<code>String(..)</code> <code>toString</code>并不等同,例子如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = &#123;</span><br><span class="line">  valueOf: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">42</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">  toString: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">4</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">a + <span class="string">""</span>; <span class="comment">// "42"</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">String</span>(a); <span class="comment">// "4"</span></span><br></pre></td></tr></table></figure>
+<p>上面的例子中，<code>a</code>是一个对象，并且重写了<code>valueOf</code> <code>toString</code>方法。<code>a + &quot;&quot;</code>时，<code>a</code>要运行<code>ToPrimitive</code>运算，返回结果 42，然后再与空字符串拼接。而<code>String( a )</code>内部运行<code>ToString</code>运算，所以直接调用<code>a.toString()</code>。</p>
+<p>一般情况，我们不会碰到这种陷进，除非我们在对象上重写了<code>valueOf</code>和<code>toString</code>方法。</p>
+<p><code>-</code> <code>*</code> <code>/</code> 操作只可作为算数运算。所以可以用来将字符串转数字，例 <code>a - 0</code> <code>a * 1</code> <code>a / 1</code>。</p>
+<p>总结：相比于 <code>String(a)</code> <code>a + &quot;&quot;</code>在开发中会更常用。</p>
+<h3 id="隐式：-–-gt-Boolean"><a href="#隐式：-–-gt-Boolean" class="headerlink" title="隐式：* –&gt; Boolean"></a>隐式：* –&gt; Boolean</h3><p>以下表达式操作会隐式地将值转为<code>boolean</code>。</p>
+<ul>
+<li><code>if ( .. )</code></li>
+<li><code>for ( .. ; .. ; .. )</code></li>
+<li><code>while ( .. )</code> <code>do..while( .. )</code></li>
+<li>三元运算符 <code>? :</code></li>
+<li>逻辑或 <code>||</code> 逻辑与 <code>&amp;&amp;</code></li>
+</ul>
+<h4 id="和-amp-amp"><a href="#和-amp-amp" class="headerlink" title="|| 和 &amp;&amp;"></a><code>||</code> 和 <code>&amp;&amp;</code></h4><p>这两个运算符的结果未必一定是<code>boolean</code>，它会返回运算符两边中的一个值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">42</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="string">"abc"</span>;</span><br><span class="line"><span class="keyword">var</span> c = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">a || b; <span class="comment">// 42</span></span><br><span class="line">a &amp;&amp; b; <span class="comment">// "abc"</span></span><br><span class="line"></span><br><span class="line">c || b; <span class="comment">// "abc"</span></span><br><span class="line">c &amp;&amp; b; <span class="comment">// null</span></span><br></pre></td></tr></table></figure>
+<h3 id="宽松相等-与-严格相等"><a href="#宽松相等-与-严格相等" class="headerlink" title="宽松相等== 与 严格相等==="></a>宽松相等<code>==</code> 与 严格相等<code>===</code></h3><p>严格相等：等号两边的值和类型都会进行比较；如果等号两边是对象，比较对象的引用地址。</p>
+<p>宽松相等：只比较等号两边的值，如果类型不同会先转化再比较；如果等号两边是对象，比较对象的引用地址。</p>
+<h4 id="宽松相等"><a href="#宽松相等" class="headerlink" title="宽松相等=="></a>宽松相等<code>==</code></h4><p>严格相等没什么好说的，最容易让人迷惑的是宽松相等<code>==</code>。大多情况下，它是瑕疵，它让代码容易出错。</p>
+<p>宽松等于两边值类型不同时，其中的一边或两边会进行转换然后再进行比较。转换的规则会有点复杂，而且甚至有点迷惑性。</p>
+<p>其中要比较注意的是 falsy values 间的比较。</p>
+<ul>
+<li><code>undefine</code> <code>null</code>两个互相宽松相等，但却不与其它 falsy values 宽松相等。</li>
+<li><code>NaN</code>与所有其它值都不相等。</li>
+</ul>
+<p>宽松相等的规则总结：</p>
+<ul>
+<li>如果其中一边是对象，那么先执行<code>ToPrimitive</code>转为基本类型</li>
+<li><code>boolean</code>执行<code>ToNumber</code></li>
+<li>string 和 number 比较，string 要<code>ToNumber</code></li>
+<li><code>null</code> <code>undefined</code>两宽松相等，和其它不宽松相等</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/javascript/" rel="tag"># javascript</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/28/event-loop-in-javascript/" rel="next" title="event loop in javascript">
+                <i class="fa fa-chevron-left"></i> event loop in javascript
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/28/json/" rel="prev" title="javascript API JSON">
+                javascript API JSON <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="博主">
+            
+              <p class="site-author-name" itemprop="name">博主</p>
+              <p class="site-description motion-element" itemprop="description">记录学习的过程</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#抽象值运算（Abstract-Value-Operations）"><span class="nav-number">1.</span> <span class="nav-text">抽象值运算（Abstract Value Operations）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ToString"><span class="nav-number">1.1.</span> <span class="nav-text">ToString</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本类型-ToString"><span class="nav-number">1.1.1.</span> <span class="nav-text">基本类型 ToString</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对象-ToString"><span class="nav-number">1.1.2.</span> <span class="nav-text">对象 ToString</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ToNumber"><span class="nav-number">1.2.</span> <span class="nav-text">ToNumber</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本类型-ToNumber"><span class="nav-number">1.2.1.</span> <span class="nav-text">基本类型 ToNumber</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对象-ToNumber"><span class="nav-number">1.2.2.</span> <span class="nav-text">对象 ToNumber</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ToBoolean"><span class="nav-number">2.</span> <span class="nav-text">ToBoolean</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#显式转换（Explicit-Coercion）"><span class="nav-number">3.</span> <span class="nav-text">显式转换（Explicit Coercion）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#显式：Strings-Numbers"><span class="nav-number">3.1.</span> <span class="nav-text">显式：Strings  Numbers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显式：Parsing-Numeric-Strings"><span class="nav-number">3.2.</span> <span class="nav-text">显式：Parsing Numeric Strings</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显式：-–-gt-Boolean"><span class="nav-number">3.3.</span> <span class="nav-text">显式：* –&gt; Boolean</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#隐式转换（Implicit-Coercion）"><span class="nav-number">4.</span> <span class="nav-text">隐式转换（Implicit Coercion）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#隐式：Strings-Numbers"><span class="nav-number">4.1.</span> <span class="nav-text">隐式：Strings  Numbers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隐式：-–-gt-Boolean"><span class="nav-number">4.2.</span> <span class="nav-text">隐式：* –&gt; Boolean</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#和-amp-amp"><span class="nav-number">4.2.1.</span> <span class="nav-text">|| 和 &amp;&amp;</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#宽松相等-与-严格相等"><span class="nav-number">4.3.</span> <span class="nav-text">宽松相等== 与 严格相等===</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#宽松相等"><span class="nav-number">4.3.1.</span> <span class="nav-text">宽松相等==</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Allen Bai</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.0.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.0"></script>
+
+  <script src="/js/src/motion.js?v=7.0.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.0"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.0"></script>
+<script src="/js/src/post-details.js?v=7.0.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=7.0.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.0">
+
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.0">
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="什么是 shell为了避免非专业人士直接操作系统导致系统受破坏，因此需要有个 shell 来操作。每个命令都是一个应用，shell 是一个能调用各个应用接口的程序。 shell 的命令可以用 type 命令来查看那些命令是 shell 内置 1type cd #cd是shell内置的 如果命令过长，可以用‘\’将回车转义(escape)，这样就可以在下一行继续输入命令。 有时候需要删除和编辑写好的">
+<meta name="keywords" content="Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Shell">
+<meta property="og:url" content="https://allenmrbai.github.io/2019/02/28/Shell/index.html">
+<meta property="og:site_name" content="Allen&#39;s Notes">
+<meta property="og:description" content="什么是 shell为了避免非专业人士直接操作系统导致系统受破坏，因此需要有个 shell 来操作。每个命令都是一个应用，shell 是一个能调用各个应用接口的程序。 shell 的命令可以用 type 命令来查看那些命令是 shell 内置 1type cd #cd是shell内置的 如果命令过长，可以用‘\’将回车转义(escape)，这样就可以在下一行继续输入命令。 有时候需要删除和编辑写好的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2025-04-24T09:20:11.081Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Shell">
+<meta name="twitter:description" content="什么是 shell为了避免非专业人士直接操作系统导致系统受破坏，因此需要有个 shell 来操作。每个命令都是一个应用，shell 是一个能调用各个应用接口的程序。 shell 的命令可以用 type 命令来查看那些命令是 shell 内置 1type cd #cd是shell内置的 如果命令过长，可以用‘\’将回车转义(escape)，这样就可以在下一行继续输入命令。 有时候需要删除和编辑写好的">
+
+
+
+
+
+
+  <link rel="canonical" href="https://allenmrbai.github.io/2019/02/28/Shell/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Shell | Allen's Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Allen's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Quik notes</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://allenmrbai.github.io/2019/02/28/Shell/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="博主">
+      <meta itemprop="description" content="记录学习的过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Allen's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Shell
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建于：2019-02-28 15:10:45" itemprop="dateCreated datePublished" datetime="2019-02-28T15:10:45+08:00">2019-02-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="更新于：2025-04-24 17:20:11" itemprop="dateModified" datetime="2025-04-24T17:20:11+08:00">2025-04-24</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="什么是-shell"><a href="#什么是-shell" class="headerlink" title="什么是 shell"></a>什么是 shell</h3><p>为了避免非专业人士直接操作系统导致系统受破坏，因此需要有个 shell 来操作。每个命令都是一个应用，shell 是一个能调用各个应用接口的程序。</p>
+<h5 id="shell-的命令"><a href="#shell-的命令" class="headerlink" title="shell 的命令"></a>shell 的命令</h5><p>可以用 type 命令来查看那些命令是 shell 内置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> <span class="built_in">cd</span> <span class="comment">#cd是shell内置的</span></span><br></pre></td></tr></table></figure>
+<p>如果命令过长，可以用‘\’将回车转义(escape)，这样就可以在下一行继续输入命令。</p>
+<p>有时候需要删除和编辑写好的命令,可以通过下面的组合键操作。</p>
+<table>
+<thead>
+<tr>
+<th>组合键</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>^u</td>
+<td>删除光标处到头部的内容</td>
+</tr>
+<tr>
+<td>^k</td>
+<td>删除光标处到尾部的内容</td>
+</tr>
+<tr>
+<td>^a</td>
+<td>到命令头部</td>
+</tr>
+<tr>
+<td>^e</td>
+<td>到命令尾部</td>
+</tr>
+</tbody>
+</table>
+<h3 id="shell-的变量功能"><a href="#shell-的变量功能" class="headerlink" title="shell 的变量功能"></a>shell 的变量功能</h3><p>获得变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#shell中获取变量需要在变量前加$</span></span><br><span class="line"><span class="comment">#打印HOME变量</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$HOME</span></span><br></pre></td></tr></table></figure>
+<p>设置变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">variable=value</span><br><span class="line"><span class="comment">#设置变量myname的值为Allen</span></span><br><span class="line">myname=Allen</span><br></pre></td></tr></table></figure>
+<p>删除变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">unset</span> variable</span><br></pre></td></tr></table></figure>
+<h5 id="变量的设置规则"><a href="#变量的设置规则" class="headerlink" title="变量的设置规则"></a>变量的设置规则</h5><ul>
+<li>变量名由字母、数字、下划线组成，并且不能由数字开头</li>
+<li>变量赋值等号左右两侧不能由空格，如“name = allenbai”或“name=allen bai”</li>
+<li>如果变量的值内要包含空格需要用‘“’或‘’’来包裹,或‘\’转义。如“name=”hello world””,“name=hello\ world”。注意如果使用的是单引号，那么单引号的内容就会变成一般的字符，里面定义的变量就会失去意义。如“name=’${name} is you’”,这里的“${name}”会变成字符，而不是变量。</li>
+<li>如果在赋值的过程中引用变量需要“”$变量名””或“${变量名}”。如“name=”$name”love”或“name=${name}love”</li>
+<li>如果需要其他指令提供的信息，可以用反单引号“`指令`”或“$(指令)”。如“name=$(uname -r)”</li>
+<li>“export variable”可以将变量导到环境变量中。可以用“env”查看所有环境变量</li>
+<li>系统的变量默认全大写，自己的变量可以用小写，以便区分。这点要不要遵守看个人偏好。</li>
+<li>“unset varaible”可以取消变量</li>
+</ul>
+<h5 id="范例"><a href="#范例" class="headerlink" title="范例"></a>范例</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#进入到目前的核心目录模块</span></span><br><span class="line"><span class="built_in">cd</span> /lib/modules/`uname -r`/kernal</span><br><span class="line"><span class="built_in">cd</span> /lib/modules/$(uname -r)/kernal</span><br><span class="line"><span class="comment">#列出crontab相关文件的权限</span></span><br><span class="line">ls -ld `locate crontab`</span><br><span class="line">ls -ld $(locate crontab)</span><br></pre></td></tr></table></figure>
+<h5 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h5><p>查看当前环境变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看当前环境变量</span></span><br><span class="line">env</span><br></pre></td></tr></table></figure>
+<p>export 不加参数也可以查看当前环境的变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span></span><br></pre></td></tr></table></figure>
+<p>如果需要查看包括自定义变量和环境变量在内的所有变量可以用 set</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#不带任何参数即可</span></span><br><span class="line"><span class="comment">#貌似我安装的CentOS 7内无法显示变量</span></span><br><span class="line"><span class="built_in">set</span></span><br></pre></td></tr></table></figure>
+<p>一些需要了解的系统环境变量</p>
+<ul>
+<li>HOME 代表使用者的主文件夹</li>
+<li>SHELL 当前环境用的是哪个 shell</li>
+<li>HISTSIZE 能被系统记录的历史指令的数量</li>
+<li>MAIL 当前用户的邮件信箱文件</li>
+<li>PATH 可执行文件搜索的路径</li>
+<li>LANG 语系数据</li>
+<li>RANDOM 随机数变量。值介于 0~32767 之间。如果要取得 0~9 之间可以这样：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">declare</span> -i number=<span class="variable">$RANDOM</span>*10/32768;<span class="built_in">echo</span> <span class="variable">$number</span></span><br></pre></td></tr></table></figure>
+<p>bash 不只有环境变量，还有一些 bash 操作接口有关的变量，以及自定义的变量。用 set 可以观察所有变量。</p>
+<p>除了环境变量外，其他 bash 内的变量</p>
+<ul>
+<li>PS1 提示字符的设置</li>
+<li>\$ shell 的 PID</li>
+<li>? 关于上个指令的回传值，0 表示成功，如果上个指令执行报错，会回传错误代码</li>
+<li>OSTYPE,HOSTTYPE,MACHTYPE 主机硬件</li>
+</ul>
+<p>环境变量与自订变量的差别是该变量是否会被子程序继续引用。</p>
+<h5 id="语系变量"><a href="#语系变量" class="headerlink" title="语系变量"></a>语系变量</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">locale</span><br></pre></td></tr></table></figure>
+<h5 id="变量的有效范围"><a href="#变量的有效范围" class="headerlink" title="变量的有效范围"></a>变量的有效范围</h5><p>鸟哥书里提到的环境变量和自订变量也可以称为全局变量(global variable)和局部变量(local variable)。</p>
+<h5 id="read-array-declare"><a href="#read-array-declare" class="headerlink" title="read,array,declare"></a>read,array,declare</h5><p>read 可以读取来自键盘输入的变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line"><span class="built_in">read</span> [-pt] variable</span><br><span class="line"><span class="comment">#-p :后面可以接提示字符</span></span><br><span class="line"><span class="comment">#-t :后面可以接等待的“秒数”</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#请用户输入用户名</span></span><br><span class="line"><span class="built_in">read</span> -p <span class="string">'请在30秒内输入用户名'</span> -t 30 user_name</span><br></pre></td></tr></table></figure>
+<p>declare/typeset 设置变量类型</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line"><span class="built_in">declare</span> [-aixr] variable</span><br><span class="line"><span class="comment">#-a :将变量声明为数组array</span></span><br><span class="line"><span class="comment">#-i :将变量声明为整数integer</span></span><br><span class="line"><span class="comment">#-x :将变量声明为环境变量</span></span><br><span class="line"><span class="comment">#-r :将变量声明为readonly类型，改变量不可更改内容，也不可以unset</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#以下两种变量声明结果不同</span></span><br><span class="line">sum=100+300+50;<span class="built_in">echo</span> <span class="variable">$sum</span> <span class="comment">#结果是 100+300+50</span></span><br><span class="line"><span class="built_in">declare</span> -i sum=100+300+50;<span class="built_in">echo</span> <span class="variable">$sum</span> <span class="comment">#结果是 450</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#将-改成+ 可以进行取消的操作</span></span><br><span class="line"><span class="built_in">declare</span> +x sum</span><br></pre></td></tr></table></figure>
+<p>定义数组</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">person[1]=<span class="string">'allen'</span></span><br><span class="line">person[2]=<span class="string">'jack'</span></span><br><span class="line">person[3]=<span class="string">'jane'</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"<span class="variable">$&#123;person[1]&#125;</span>,<span class="variable">$&#123;person[2]&#125;</span>,<span class="variable">$&#123;person[3]&#125;</span>"</span></span><br></pre></td></tr></table></figure>
+<h5 id="变量的删除、取代和替换"><a href="#变量的删除、取代和替换" class="headerlink" title="变量的删除、取代和替换"></a>变量的删除、取代和替换</h5><p>从前面开始删除变量中的某些内容</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法 变量名+‘#’+匹配规则(pattern)</span></span><br><span class="line"><span class="comment">#这里的‘#’表示从最前面开始向右删，且删最短的那个</span></span><br><span class="line"><span class="variable">$&#123;variable#pattern&#125;</span></span><br><span class="line"><span class="comment">#如果要删除最长的要写‘##’,有点像正则表达式内的贪婪匹配</span></span><br><span class="line"><span class="variable">$&#123;variable##pattern&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$PATH</span></span><br><span class="line"><span class="comment">#/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:/home/allen/.local/bin:/home/allen/bin</span></span><br><span class="line"><span class="comment">#删除/usr/local/bin:这个串</span></span><br><span class="line"><span class="variable">$&#123;PATH#/*local/bin:&#125;</span></span><br><span class="line"><span class="comment">#删除前面所有目录，保留最后一个。注意这里是‘##’,如果是‘#’的话，它只删掉第一个</span></span><br><span class="line"><span class="variable">$&#123;PATH##/*:&#125;</span></span><br></pre></td></tr></table></figure>
+<p>从后面开始删除变量中的某些内容</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#从后面开始向左删，且删最短的那个。用法与‘#’类似</span></span><br><span class="line"><span class="variable">$&#123;variable%pattern&#125;</span></span><br><span class="line"><span class="comment">#同样的，如果要删尽可能多的内容，是‘%%’</span></span><br><span class="line"><span class="variable">$&#123;variable%%pattern&#125;</span></span><br></pre></td></tr></table></figure>
+<p>替换内容</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法 pattern是指匹配规则 new是新内容</span></span><br><span class="line"><span class="variable">$&#123;variable/pattern/new&#125;</span></span><br><span class="line"><span class="comment">#全部替换</span></span><br><span class="line"><span class="variable">$&#123;variable//pattern/new&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#将匹配到的第一个sbin替换为大写的SBIN</span></span><br><span class="line"><span class="variable">$&#123;PATH/sbin/SBIN&#125;</span></span><br><span class="line"><span class="comment">#如果要全部替换，第一个 ‘/’要写成‘//’</span></span><br><span class="line"><span class="variable">$&#123;PATH//sbin/SBIN&#125;</span></span><br></pre></td></tr></table></figure>
+<h5 id="变量的测试与内容替换"><a href="#变量的测试与内容替换" class="headerlink" title="变量的测试与内容替换"></a>变量的测试与内容替换</h5><p>‘-’</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果old_var未定义 则new_var的值为content</span></span><br><span class="line">new_var=<span class="variable">$&#123;old_var-content&#125;</span></span><br></pre></td></tr></table></figure>
+<p>有点像 js 里的管道符号</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> new_var = old_var || content;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果old_var未定义或为空值 则new_var的值为content</span></span><br><span class="line"><span class="comment">#注意这里多了个‘:’</span></span><br><span class="line">new_var=<span class="variable">$&#123;old_var:-content&#125;</span></span><br></pre></td></tr></table></figure>
+<p>‘+’</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果old_var有定义(包括空值) 则new_var的值为content</span></span><br><span class="line">new_var=<span class="variable">$&#123;old_var+content&#125;</span></span><br></pre></td></tr></table></figure>
+<p>有点像 js 里的‘&amp;&amp;’</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> new_var = old_var &amp;&amp; content;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果old_var有定义且值不为空 则new_var的值为content</span></span><br><span class="line"><span class="comment">#注意这里多了个‘:’</span></span><br><span class="line">new_var=<span class="variable">$&#123;old_var:+content&#125;</span></span><br></pre></td></tr></table></figure>
+<p>‘=’</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这个效果和‘-’一样，但多了一个效果，就是content赋值给new_var的同时也会赋值给old_var</span></span><br><span class="line">new_var=<span class="variable">$&#123;old_var=content&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这个效果和‘:-’一样，但多了一个效果，就是content赋值给new_var的同时也会赋值给old_var</span></span><br><span class="line"><span class="comment">#注意这里多了个‘:’</span></span><br><span class="line">new_var=<span class="variable">$&#123;old_var:=content&#125;</span></span><br></pre></td></tr></table></figure>
+<p>‘?’</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果old_var未定义 就会告知控制台warn的内容</span></span><br><span class="line">new_var=<span class="variable">$&#123;old_var?warn&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果old_var未定义或空值 就会告知控制台warn的内容</span></span><br><span class="line"><span class="comment">#注意这里多了个‘:’</span></span><br><span class="line">new_var=<span class="variable">$&#123;old_var:?warn&#125;</span></span><br></pre></td></tr></table></figure>
+<p>其实不难发现‘-’,‘=’,‘?’都是假设 old_var 未定义才生效的，如果需要 old_var 为空值也生效加个‘:’就好。</p>
+<p>而‘+’是假设 old_var 已定义才生效(无论有没有值)，如果需要 old_var 为空值不生效加个‘:’就好。</p>
+<h3 id="命令别名与历史命名"><a href="#命令别名与历史命名" class="headerlink" title="命令别名与历史命名"></a>命令别名与历史命名</h3><h5 id="命令别名"><a href="#命令别名" class="headerlink" title="命令别名"></a>命令别名</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看所有命令别名</span></span><br><span class="line"><span class="built_in">alias</span></span><br><span class="line"><span class="comment"># 生成命令别名</span></span><br><span class="line"><span class="built_in">alias</span> comand_name=<span class="string">'comand'</span></span><br><span class="line"><span class="comment">#例子 命令别名是lm,指令是‘ls -al | more’</span></span><br><span class="line"><span class="built_in">alias</span> lm=<span class="string">'ls -al | more'</span></span><br><span class="line"><span class="comment"># 删除命令别名</span></span><br><span class="line"><span class="built_in">unalias</span> comand_name</span><br><span class="line"><span class="comment">#例子 删除命令别名 lm</span></span><br><span class="line"><span class="built_in">unalias</span> lm</span><br></pre></td></tr></table></figure>
+<h3 id="bash-的环境配置文件"><a href="#bash-的环境配置文件" class="headerlink" title="bash 的环境配置文件"></a>bash 的环境配置文件</h3><h5 id="重要的环境配置文件"><a href="#重要的环境配置文件" class="headerlink" title="重要的环境配置文件"></a>重要的环境配置文件</h5><table>
+<thead>
+<tr>
+<th>配置文件</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/etc/issue</td>
+<td>bash 的开机画面</td>
+</tr>
+<tr>
+<td>/etc/motd</td>
+<td>bash 登录后的提示信息</td>
+</tr>
+<tr>
+<td>/etc/locale.conf</td>
+<td>决定默认使用语系，由/etc/profile.d/lang.sh 调用进来</td>
+</tr>
+<tr>
+<td>/etc/profile</td>
+<td>登录 bash 时读取的文件，是系统整体的设置</td>
+</tr>
+<tr>
+<td>/etc/profile.d/*.sh</td>
+<td>/etc/profile 运行时回去执行/etc/profile.d 下所有.sh 结尾的文件</td>
+</tr>
+<tr>
+<td>/usr/share/bash-completion/completions/*</td>
+<td>Tab 的补全设置，由/etc/profile.d/bash_completion.sh 调用进来</td>
+</tr>
+<tr>
+<td>~/.bash_profile 或 ~/.bash_login 或 ~/.profile</td>
+<td>属于使用者个人的设置。其实只会读取其中的一个。最先读取~/.bash_profile，如果没有再读取下一个，以此类推</td>
+</tr>
+<tr>
+<td>~/.bashrc</td>
+<td>获取 no-login shell 时会读取该文件。还有~/.bash_profile 会读该文件</td>
+</tr>
+<tr>
+<td>~/.bash_history</td>
+<td>历史命令记录的地方</td>
+</tr>
+<tr>
+<td>~/.bash_logout</td>
+<td>登出的时候执行的文件</td>
+</tr>
+</tbody>
+</table>
+<h5 id="读入环境配置文件的指令"><a href="#读入环境配置文件的指令" class="headerlink" title="读入环境配置文件的指令"></a>读入环境配置文件的指令</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line"><span class="built_in">source</span> 配置文件文件名</span><br><span class="line"><span class="comment">#例子 当修改了~/.bash_profile时需要登出再登录后才生效，为了让设置生效可以用source指令</span></span><br><span class="line"><span class="built_in">source</span> ~/.bash_profile</span><br><span class="line"><span class="comment">#soucrce指令也可以写成‘.’</span></span><br><span class="line">. ~/.bash_profile</span><br></pre></td></tr></table></figure>
+<h3 id="万用字符和特殊符号"><a href="#万用字符和特殊符号" class="headerlink" title="万用字符和特殊符号"></a>万用字符和特殊符号</h3><h5 id="万用字符"><a href="#万用字符" class="headerlink" title="万用字符"></a>万用字符</h5><p>万用字符有点像正则匹配有点类似但有差别</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>*</td>
+<td>代表 0 到无穷个任意字符，相当于正则的.*</td>
+</tr>
+<tr>
+<td>?</td>
+<td>随机的一个字符</td>
+</tr>
+<tr>
+<td>[]</td>
+<td>表示括号内的任意一个字符</td>
+</tr>
+<tr>
+<td>[-]</td>
+<td>字符编码范围，例如[0-9]表示 0 到 9 之间的所有字符</td>
+</tr>
+<tr>
+<td>[^]</td>
+<td>反向选择，例如[^abc]表示非 a,b,c 的字符</td>
+</tr>
+</tbody>
+</table>
+<h5 id="特殊符号"><a href="#特殊符号" class="headerlink" title="特殊符号"></a>特殊符号</h5><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#</td>
+<td>注释符号</td>
+</tr>
+<tr>
+<td>\</td>
+<td>转义</td>
+</tr>
+<tr>
+<td>\</td>
+<td></td>
+<td>管线(pipe),分隔两个管线命令的界定</td>
+</tr>
+<tr>
+<td>;</td>
+<td>连续指令下达分隔符号</td>
+</tr>
+<tr>
+<td>~</td>
+<td>使用者的主文件夹</td>
+</tr>
+<tr>
+<td>\$</td>
+<td>取用变量前置字符：亦即是变量之前需要加的变量取代值</td>
+</tr>
+<tr>
+<td>&amp;</td>
+<td>工作控制 （job control）：将指令变成背景下工作</td>
+</tr>
+<tr>
+<td>!</td>
+<td>逻辑运算符,not 的意思</td>
+</tr>
+<tr>
+<td>/</td>
+<td>目录符号：路径分隔的符号</td>
+</tr>
+<tr>
+<td>>和>></td>
+<td>数据流重导向：输出导向，分别是“取代”与“累加”</td>
+</tr>
+<tr>
+<td>\&lt;和\&lt;\&lt;</td>
+<td>数据流重导向：输入导向</td>
+</tr>
+<tr>
+<td>‘ ‘</td>
+<td>单引号，不具有变量置换的功能 （\$ 变为纯文本）</td>
+</tr>
+<tr>
+<td>“ “</td>
+<td>具有变量置换的功能！ （\$ 可保留相关功能）</td>
+</tr>
+<tr>
+<td>`</td>
+<td>两个“`”中间为可以先执行的指令，亦可使用 \$（ ）</td>
+</tr>
+<tr>
+<td>（）</td>
+<td>在中间为子 shell 的起始与结束</td>
+</tr>
+<tr>
+<td>{ }</td>
+<td>在中间为命令区块的组合！</td>
+</tr>
+</tbody>
+</table>
+<h5 id="数据流重导向"><a href="#数据流重导向" class="headerlink" title="数据流重导向"></a>数据流重导向</h5><p>数据流重导向就是将某个指令执行后应该要出现在屏幕上的数据， 给他传输到<br>其他的地方，例如文件或者是设备。</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>\&lt;</td>
+<td>标准输入，将某个文件代替键盘输入</td>
+</tr>
+<tr>
+<td>\&lt;\&lt;</td>
+<td>标准输入，以某个符号作为文件的结束标记</td>
+</tr>
+<tr>
+<td>>或 1></td>
+<td>标准输出,覆盖原内容</td>
+</tr>
+<tr>
+<td>>>或 1>></td>
+<td>标准输出，添加的原内容尾部</td>
+</tr>
+<tr>
+<td>2></td>
+<td>标准错误输出,覆盖原内容</td>
+</tr>
+<tr>
+<td>2>></td>
+<td>标准错误输出，添加的原内容的尾部</td>
+</tr>
+</tbody>
+</table>
+<p>以下是例子</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#例 将ll列出的内容保存到~/rootfile内</span></span><br><span class="line">ll / &gt; ~/rootfile</span><br><span class="line"></span><br><span class="line"><span class="comment">#例 创建catfile文件并将~/.bashrc的内容给它</span></span><br><span class="line">cat &gt; catfile &lt; ~/.bashrc</span><br><span class="line"></span><br><span class="line"><span class="comment">#原来cat不仅仅只有读文件的功能，不加参数还会读取键盘录入</span></span><br><span class="line"><span class="comment">#例 用cat命令新建catfile，并以键盘的录入内容作为该文件的内容。想要结束输入按^d。</span></span><br><span class="line">cat &gt; catfile</span><br><span class="line"></span><br><span class="line"><span class="comment">#例 用cat命令新建catfile，并以‘eof’做为结束标记。</span></span><br><span class="line">cat &gt; catfile &lt;&lt; <span class="string">'eof'</span> <span class="comment">#当你输入eof回车时，就和按^d的效果是一样的</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#例 使用find指令时，遇到没有读取权限的文件会报错，通过2\&gt;将错误导到/dev/null</span></span><br><span class="line">find /home -name .bashrc 2&gt; /dev/null <span class="comment">#/dev/null相当于垃圾桶黑洞</span></span><br><span class="line"><span class="comment">#例 将正确和错误的数据都写入同一个文件</span></span><br><span class="line">find /home -name .bashrc &gt; list 2&gt; &amp;1</span><br><span class="line"><span class="comment">#或者这么写</span></span><br><span class="line">find /home -name .bashrc &amp;&gt; list</span><br></pre></td></tr></table></figure>
+<h5 id="和-amp-amp-和"><a href="#和-amp-amp-和" class="headerlink" title=";和&amp;&amp;和||"></a>;和&amp;&amp;和||</h5><p>‘;’这个很好理解，相当于每个语句的结束符。有了它，就可以同时写个条指令了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#例 关机前执行两次sync同步写入磁盘</span></span><br><span class="line">sync;sync;shutdown -h now</span><br></pre></td></tr></table></figure>
+<p>&amp;&amp;前后连接两个指令，前一个指令报错就不执行后一个指令；||前后连接两个指令，前一个不报错就不执行后一个指令。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#非root用户执行find /root，$?返回错误代码，所这里的ls不执行</span></span><br><span class="line">find /root &amp;&amp; ls</span><br><span class="line"><span class="comment">#这里的ls会执行</span></span><br><span class="line">find /root || ls</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#我们要在tmp下面创建/abc/hehe，但我们不知道abc是否存在。于是我们可以用下面的方法。</span></span><br><span class="line">ls /tmp/abc || mkdir /tmp/abc &amp;&amp; touch /tmp/abc/hehe</span><br></pre></td></tr></table></figure>
+<h6 id="解析："><a href="#解析：" class="headerlink" title="解析："></a>解析：</h6><p>情况一，tmp 下没 abc 文件夹。</p>
+<p>由于没有 abc 文件夹，那第一个指令回传值（\$?）不为 0，也就是说第一个指令报错了，于是会执行第二指令新建 abc 目录。第二个指令执行成功，于是会执行第三个指令创建 hehe 文件。</p>
+<p>情况二，tmp 下有 abc 文件夹。<br>第一个指令成功，所以第二个指令不执行。注意了，这行语句并没有就此结束。第一个回传值会继续传递，由于第一个回传值是 0，所以第三个指令会执行。</p>
+<p>结论：无论有没有 abc 目录，我们都能创建/tmp/abc/hehe 文件</p>
+<h5 id="管线符号-pipe"><a href="#管线符号-pipe" class="headerlink" title="管线符号(pipe)"></a>管线符号(pipe)</h5><p>‘|’就是管线符号了。如果数据流重导向是将指令的结果导到设备和文件或设备和文件的数据导到指令的话；那么 pipe 就是将前一个命令的数据输出做为后一个命令的输入。<br>使用管线符号需要注意两点：</p>
+<ol>
+<li>管线符号后面的那个命令必须是管线命令。能接受前一个指令的数据成为 standard input 才是管线命令。</li>
+<li>管线命令仅会处理 standard output，对于 standard error output 会被忽略。</li>
+</ol>
+<h5 id="管线符号的组合运用"><a href="#管线符号的组合运用" class="headerlink" title="管线符号的组合运用"></a>管线符号的组合运用</h5><ul>
+<li>cut</li>
+</ul>
+<p>cut 可以将数据按我们的要求切出来，可以想象成 split。该命令是按行来操作的。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法一；按分隔字符将一行数据切成多段，并攫取其中的几个片段</span></span><br><span class="line">cut -d <span class="string">'分隔字符'</span> -f 分段区间</span><br><span class="line"><span class="comment">#例 将$PATH按‘:’分隔，并取第一段和第4段</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;PATH&#125;</span> | cut -d <span class="string">':'</span> -f 1,4</span><br><span class="line"><span class="comment">#例 将$PATH按‘:’分隔，并取第4段到最后一段</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;PATH&#125;</span> | cut -d <span class="string">':'</span> -f 4-</span><br><span class="line"><span class="comment">#例 用last查看登录者信息，只显示登陆者名称</span></span><br><span class="line">last | cut -d <span class="string">' '</span> -f 1</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法二；</span></span><br><span class="line">cut -c 字符区间</span><br><span class="line"><span class="comment">#例 将export的信息前面 declare -x的字去掉</span></span><br><span class="line"><span class="built_in">export</span> | cut -c 12-</span><br></pre></td></tr></table></figure>
+<ul>
+<li>grep</li>
+</ul>
+<p>查询每一行，把含有我们想要的文字的句子列出来。grep 能配合正则使用。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">grep [-acinv] [--color=auto] <span class="string">'搜寻字符'</span> filename</span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-a ：将 binary 文件以 text 文件的方式搜寻数据</span></span><br><span class="line"><span class="comment">#-c ：计算找到 '搜寻字串' 的次数</span></span><br><span class="line"><span class="comment">#-i ：忽略大小写的不同，所以大小写视为相同</span></span><br><span class="line"><span class="comment">#-n ：顺便输出行号</span></span><br><span class="line"><span class="comment">#-v ：反向选择，亦即显示出没有 '搜寻字串' 内容的那一行！</span></span><br><span class="line"><span class="comment">#--color=auto ：可以将找到的关键字部分加上颜色的显示喔！</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#例 将last中出现root的那行取出</span></span><br><span class="line">last | grep <span class="string">'root'</span></span><br><span class="line"><span class="comment">#例 取出 /etc/man_db.conf 内含 MANPATH 的那几行</span></span><br><span class="line">grep --color=auto <span class="string">'MANPATH'</span> /etc/man_db.conf</span><br></pre></td></tr></table></figure>
+<ul>
+<li>sort</li>
+</ul>
+<p>sort 很明显是用来排序的。排序的字符和语系有关，因此， 如果您需要排<br>序时，建议使用 LANG=C 来让语系统一，数据排序比较好一些。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">sort [-fbMnrtuk] [file or stdin]</span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-f ：忽略大小写的差异，例如 A 与 a 视为编码相同；</span></span><br><span class="line"><span class="comment">#-b ：忽略最前面的空白字符部分；</span></span><br><span class="line"><span class="comment">#-M ：以月份的名字来排序，例如 JAN, DEC 等等的排序方法；</span></span><br><span class="line"><span class="comment">#-n ：使用“纯数字”进行排序（默认是以文字体态来排序的）；</span></span><br><span class="line"><span class="comment">#-r ：反向排序；</span></span><br><span class="line"><span class="comment">#-u ：就是 uniq ，相同的数据中，仅出现一行代表；</span></span><br><span class="line"><span class="comment">#-t ：分隔符号，默认是用 [tab] 键来分隔；</span></span><br><span class="line"><span class="comment">#-k ：以那个区间 （field） 来进行排序的意思</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#例 将/etc/passwd下的账号进行排序</span></span><br><span class="line">cat /etc/passwd | sort</span><br><span class="line"></span><br><span class="line"><span class="comment">#例 /etc/passwd内容是以‘:’分隔的，我们想用第三栏来排序</span></span><br><span class="line">cat /etc/passwd | sort -t <span class="string">':'</span> -k 3</span><br><span class="line"></span><br><span class="line"><span class="comment">#取出last中的所有账号，并排序</span></span><br><span class="line">last | cut -d <span class="string">' '</span> -f1 | sort</span><br></pre></td></tr></table></figure>
+<ul>
+<li>uniq</li>
+</ul>
+<p>将排序完的数据去重。（只有连续的重复内容才会被去除，所以使用前需要排序）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">uniq [-ic]</span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-i ：忽略大小写字符的不同；</span></span><br><span class="line"><span class="comment">#-c ：进行计数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#例 将last取出的账号排序并除重</span></span><br><span class="line">last | cut -d <span class="string">' '</span> -f1 | sort | uniq</span><br><span class="line"><span class="comment">#例 如果要在上个例子的基础上加上计数</span></span><br><span class="line">last | cut -d <span class="string">' '</span> -f1 | sort | uniq -c</span><br></pre></td></tr></table></figure>
+<ul>
+<li>wc</li>
+</ul>
+<p>查看文件多少行，多少个字符</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">wc [-lwm]</span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-l ：仅列出行；</span></span><br><span class="line"><span class="comment">#-w ：仅列出多少字（英文单字）；</span></span><br><span class="line"><span class="comment">#-m ：多少字符；</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#查看/etc/man_db.conf里面有多少岁字、行、字符</span></span><br><span class="line">cat /etc/man_db.conf | wc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>tee</li>
+</ul>
+<p>我们可以使用数据流重导向‘&gt;’将 stdout 输入到文件。如果我们在输入到文件的同时，还要继续使用这个 stdout 的话，我们可使用 tee（双向重导向）。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">tee [-a] file</span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-a ：以累加 （append） 的方式，将数据加入 file 当中！</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#例 将last输出一份到last.list</span></span><br><span class="line">last | tee last.list | cut -d <span class="string">" "</span> -f1</span><br></pre></td></tr></table></figure>
+<ul>
+<li>unix2dos dos2unix</li>
+</ul>
+<p>unix2dos 是将文本的 unix 换行符号换成 dos 的。</p>
+<ul>
+<li>tr</li>
+</ul>
+<p>删除或替换文本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">tr [-ds] SET1 ...</span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-d ：删除讯息当中的 SET1 这个字串；</span></span><br><span class="line"><span class="comment">#-s ：取代掉重复的字符！</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#例 将last输出的信息中所有的小写变成大写</span></span><br><span class="line">last | tr [a-z] [A-Z]</span><br><span class="line"><span class="comment">#例 将/etc/passwd输出的小写中的冒号‘:’删除</span></span><br><span class="line">cat /etc/passwd | tr -d <span class="string">':'</span></span><br><span class="line"><span class="comment">#例 将/etc/passd转存成dos断行到/root/passwd中，再将^M符号删除</span></span><br><span class="line">cp /etc/passwd ~/passwd &amp;&amp; unix2dos ~/passwd</span><br><span class="line"><span class="comment">#例 上面那个方法可以用tr的方法来代替。^M可以用\r来代替</span></span><br><span class="line">cat ~/passwd | tr -d <span class="string">'\r'</span> &gt; ~/passwd.linux</span><br></pre></td></tr></table></figure>
+<ul>
+<li>col</li>
+</ul>
+<p>将 tab 转成对等的空白键</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">col [-xb]</span><br><span class="line"></span><br><span class="line"><span class="comment">#cat -A可以看到tab的符号为^I</span></span><br><span class="line">cat -A /etc/man_db.conf</span><br><span class="line"><span class="comment">#将/etc/man_db.conf的tab转为空白键后再cat -A查看</span></span><br><span class="line">cat /etc/man_db.conf | col -x | cat -A | more</span><br></pre></td></tr></table></figure>
+<ul>
+<li>join</li>
+</ul>
+<p>将含有相同数据的行拼接在一起。使用时最好排序下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">join [-ti12]</span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-t ：join 默认以空白字符分隔数据，并且比对“第一个字段”的数据，</span></span><br><span class="line"><span class="comment">#如果两个文件相同，则将两笔数据联成一行，且第一个字段放在第一个！</span></span><br><span class="line"><span class="comment">#-i ：忽略大小写的差异；</span></span><br><span class="line"><span class="comment">#-1 ：这个是数字的 1 ，代表“第一个文件要用那个字段来分析”的意思；</span></span><br><span class="line"><span class="comment">#-2 ：代表“第二个文件要用那个字段来分析”的意思。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#例 用root 的身份，将 /etc/passwd 与 /etc/shadow 相关数据整合成一栏</span></span><br><span class="line">join -t <span class="string">':'</span> /etc/passwd /etc/shadow | head -n 3</span><br><span class="line"><span class="comment">#例 ：我们知道 /etc/passwd 第四个字段是 GID ，那个 GID 记录在/etc/group 当中的第三个字段，请问如何将两个文件整合？</span></span><br><span class="line">join -t <span class="string">':'</span> -1 4 /etc/passwd -2 3 /etc/group | head -n 3</span><br></pre></td></tr></table></figure>
+<ul>
+<li>paste</li>
+</ul>
+<p>paste 比 join 简单粗暴，它直接将两个文件的行相连，并用 tab 隔开</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">paste [-d] file1 file2</span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-d ：后面可以接分隔字符。默认是以 [tab] 来分隔的！</span></span><br><span class="line"><span class="comment">#- ：如果 file 部分写成 - ，表示来自 standard input 的数据的意思。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>expand</li>
+</ul>
+<p>将 tab 转成空白键</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">expand [-t] file</span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-t ：后面可以接数字。一般来说，一个 tab 按键可以用 8 个空白键取代。</span></span><br><span class="line"><span class="comment">#我们也可以自行定义一个 [tab] 按键代表多少个字符呢！#</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>split</li>
+</ul>
+<p>他可以帮你将一个大文件，依据文件大小或行数来分区，就可以将大文件分区成为小文件了！</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用法</span></span><br><span class="line">split [-bl] file PREFIX</span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-b ：后面可接欲分区成的文件大小，可加单位，例如 b, k, m 等；</span></span><br><span class="line"><span class="comment">#-l ：以行数来进行分区。</span></span><br><span class="line"><span class="comment">#PREFIX ：代表前置字符的意思，可作为分区文件的前导文字。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#例 我的 /etc/services 有六百多K，若想要分成 300K 一个文件时？</span></span><br><span class="line"><span class="built_in">cd</span> /tmp; split -b 300k /etc/services services</span><br><span class="line"><span class="comment">#例 将上面分割出来的三个文件合成一个文件，名为servicesback</span></span><br><span class="line">cat services* &gt;&gt; servicesback</span><br><span class="line"></span><br><span class="line"><span class="comment">#例 使用ls -al / 输出的信息中，没十行记录成一个文件</span></span><br><span class="line">ls -al | split -l 10 - lsroot</span><br></pre></td></tr></table></figure>
+<ul>
+<li>xargs</li>
+</ul>
+<p>xargs 可以读入 stdin 的数据，并且以空白字符或断行字符作为分辨，将 stdin 的数据分隔成为 arguments</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">xargs [-0epn] <span class="built_in">command</span></span><br><span class="line"><span class="comment">#选项与参数：</span></span><br><span class="line"><span class="comment">#-0 ：如果输入的 stdin 含有特殊字符，例如 `, \, 空白键等等字符时，这个 -0 参数可以将他还原成一般字符。这个参数可以用于特殊状态喔！</span></span><br><span class="line"><span class="comment">#-e ：这个是 EOF （end of file） 的意思。后面可以接一个字串，当 xargs分析到这个字串时，就会停止继续工作！</span></span><br><span class="line"><span class="comment">#-p ：在执行每个指令的 argument 时，都会询问使用者的意思；</span></span><br><span class="line"><span class="comment">#-n ：后面接次数，每次 command 指令执行时，要使用几个参数的意思。当 xargs后面没有接任何的指令时，默认是以 echo 来进行输出喔！</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#例 取出/etc/passwd中的前三个用户，并依次对每个用户执行id命令</span></span><br><span class="line">cut -d <span class="string">':'</span> -f 1 /etc/passwd | head -n 3 | xargs -n 1 id</span><br></pre></td></tr></table></figure>
+<ul>
+<li>-</li>
+</ul>
+<p>在管线命令的使用中‘-’是非常重要的，它指代前一个命令的标准输出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir /tmp/homeback</span><br><span class="line">tar -cvf - /home | tar -xvf - -C /tmp/homeback</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/28/Linux常用命令/" rel="next" title="Linux常用命令">
+                <i class="fa fa-chevron-left"></i> Linux常用命令
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/28/Linux文件权限/" rel="prev" title="Linux文件权限">
+                Linux文件权限 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="博主">
+            
+              <p class="site-author-name" itemprop="name">博主</p>
+              <p class="site-description motion-element" itemprop="description">记录学习的过程</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是-shell"><span class="nav-number">1.</span> <span class="nav-text">什么是 shell</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#shell-的命令"><span class="nav-number">1.0.1.</span> <span class="nav-text">shell 的命令</span></a></li></ol></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#shell-的变量功能"><span class="nav-number">2.</span> <span class="nav-text">shell 的变量功能</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#变量的设置规则"><span class="nav-number">2.0.1.</span> <span class="nav-text">变量的设置规则</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#范例"><span class="nav-number">2.0.2.</span> <span class="nav-text">范例</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#环境变量"><span class="nav-number">2.0.3.</span> <span class="nav-text">环境变量</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#语系变量"><span class="nav-number">2.0.4.</span> <span class="nav-text">语系变量</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#变量的有效范围"><span class="nav-number">2.0.5.</span> <span class="nav-text">变量的有效范围</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#read-array-declare"><span class="nav-number">2.0.6.</span> <span class="nav-text">read,array,declare</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#变量的删除、取代和替换"><span class="nav-number">2.0.7.</span> <span class="nav-text">变量的删除、取代和替换</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#变量的测试与内容替换"><span class="nav-number">2.0.8.</span> <span class="nav-text">变量的测试与内容替换</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#命令别名与历史命名"><span class="nav-number">3.</span> <span class="nav-text">命令别名与历史命名</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#命令别名"><span class="nav-number">3.0.1.</span> <span class="nav-text">命令别名</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bash-的环境配置文件"><span class="nav-number">4.</span> <span class="nav-text">bash 的环境配置文件</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#重要的环境配置文件"><span class="nav-number">4.0.1.</span> <span class="nav-text">重要的环境配置文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#读入环境配置文件的指令"><span class="nav-number">4.0.2.</span> <span class="nav-text">读入环境配置文件的指令</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#万用字符和特殊符号"><span class="nav-number">5.</span> <span class="nav-text">万用字符和特殊符号</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#万用字符"><span class="nav-number">5.0.1.</span> <span class="nav-text">万用字符</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#特殊符号"><span class="nav-number">5.0.2.</span> <span class="nav-text">特殊符号</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#数据流重导向"><span class="nav-number">5.0.3.</span> <span class="nav-text">数据流重导向</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#和-amp-amp-和"><span class="nav-number">5.0.4.</span> <span class="nav-text">;和&amp;&amp;和||</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#解析："><span class="nav-number">5.0.4.1.</span> <span class="nav-text">解析：</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#管线符号-pipe"><span class="nav-number">5.0.5.</span> <span class="nav-text">管线符号(pipe)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#管线符号的组合运用"><span class="nav-number">5.0.6.</span> <span class="nav-text">管线符号的组合运用</span></a></li></ol></li></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Allen Bai</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.0.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.0"></script>
+
+  <script src="/js/src/motion.js?v=7.0.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.0"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.0"></script>
+<script src="/js/src/post-details.js?v=7.0.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=7.0.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
